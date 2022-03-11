@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"example.com/go-demo1/db"
-	"example.com/go-demo1/distqueue"
 	"example.com/go-demo1/interfacelist"
+	"example.com/go-demo1/msgqueue"
 )
 
 // This example creates a PriorityQueue with some items, adds and manipulates an item,
@@ -31,10 +31,15 @@ func main() {
 
 	// GET /timer/<id>
 	fmt.Println(sortDataImpl.Get("id-2"))
+
+	// A thread which runs periodically,
+	// steps Extract and Publish should run like a transaction
 	items := sortDataImpl.Extract(2, 0)
 	fmt.Println(items)
-	var queueImpl interfacelist.IQueueSystem = distqueue.GetQueueInstFromFactory()
+	var queueImpl interfacelist.IQueueSystem = msgqueue.GetQueueInstFromFactory()
 	queueImpl.Publish(items)
+
+	// Can be a different thread to execute the tasks
 	subItems := queueImpl.SubscribeAndExecute(2)
 	fmt.Println(subItems)
 }
